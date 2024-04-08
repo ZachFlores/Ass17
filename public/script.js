@@ -149,12 +149,6 @@ document.getElementById("addItemForm").addEventListener("submit", async (e) => {
 
 
 
-
-
-
-
-
-
 document.getElementById("addCraftButton").addEventListener("click", showAddItemModal);
 
 document.getElementById("pencilIcon").addEventListener("click", async () => {
