@@ -31,12 +31,16 @@ const showModal = (craft, index) => {
       <ul>${craft.supplies.map(item => `<li>${item}</li>`).join("")}</ul>
   `;
 
-  modal.style.display = "block";
+  // Check if modal is already open
+  if (modal.style.display !== "block") {
+    modal.style.display = "block";
 
-  modal.dataset.index = index;
+    // Store the index of the clicked craft
+    modal.dataset.index = index;
 
-  const deleteButton = document.getElementById("deleteCraftButton");
-  deleteButton.addEventListener("click", () => deleteCraft(modal.dataset.index));
+    const deleteButton = document.getElementById("deleteCraftButton");
+    deleteButton.addEventListener("click", () => deleteCraft(modal.dataset.index));
+  }
 };
 
 
@@ -46,17 +50,26 @@ const closeModal = () => {
 };
 
 const populateGallery = async () => {
-  const crafts = await getCrafts();
-  const gallery = document.querySelector(".gallery");
-  gallery.innerHTML = "";
-  crafts.forEach((craft, index) => { 
+  try {
+    const response = await fetch("/api/crafts");
+    const crafts = await response.json();
+    const gallery = document.querySelector(".gallery");
+    gallery.innerHTML = "";
+    crafts.forEach((craft, index) => {
       const img = document.createElement("img");
       img.src = `images/${craft.image}`;
       img.alt = craft.name;
-      img.onclick = () => showModal(craft, index); 
+      img.onclick = () => showModal(craft, index);
       gallery.appendChild(img);
-  });
+    });
+  } catch (error) {
+    console.error("Error populating gallery:", error);
+  }
 };
+
+
+
+
 
 populateGallery();
 
@@ -106,6 +119,7 @@ document.getElementById("addItemForm").addEventListener("submit", async (e) => {
               console.log("Item updated successfully");
               hideAddItemModal();
               populateGallery(); 
+              closeModal(); // Hide the modal after saving edits
           } else {
               console.error("Failed to update item:", response.statusText);
               console.log("Response:", response);
@@ -115,13 +129,15 @@ document.getElementById("addItemForm").addEventListener("submit", async (e) => {
       }
   } else { 
       try {
+          formData.append('itemImage', document.getElementById('itemImage').files[0]); // Append the image file to form data
           const response = await fetch("/api/addItem", {
               method: "POST",
               body: formData,
           });
           if (response.ok) {
               hideAddItemModal();
-              populateGallery(); 
+              populateGallery();
+              closeModal(); // Hide the modal after saving new item
           } else {
               console.error("Failed to add item:", response.statusText);
           }
@@ -130,6 +146,13 @@ document.getElementById("addItemForm").addEventListener("submit", async (e) => {
       }
   }
 });
+
+
+
+
+
+
+
 
 
 document.getElementById("addCraftButton").addEventListener("click", showAddItemModal);

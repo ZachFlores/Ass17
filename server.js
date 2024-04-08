@@ -54,7 +54,7 @@ app.post("/api/addItem", (req, res) => {
         const newItem = {
             name: req.body.itemName,
             description: req.body.itemDescription,
-            image: req.file.filename,
+            image: req.file.filename, // Use the filename of the uploaded image
             supplies: req.body.supply
         };
         crafts.push(newItem);
@@ -70,26 +70,32 @@ app.post("/api/addItem", (req, res) => {
 });
 
 app.put("/api/crafts/:name", (req, res) => {
-    const { name } = req.params;
-    const { itemDescription, supply } = req.body;
+  const { name } = req.params;
+  const { itemName, itemDescription, supply } = req.body;
 
-    try {
-        const crafts = JSON.parse(fs.readFileSync('crafts.json', 'utf8'));
-        const craftIndex = crafts.findIndex(craft => craft.name === name);
+  try {
+      const crafts = JSON.parse(fs.readFileSync('crafts.json', 'utf8'));
+      const craftIndex = crafts.findIndex(craft => craft.name === name);
 
-        if (craftIndex !== -1) {
-            crafts[craftIndex].description = itemDescription;
-            crafts[craftIndex].supplies = supply;
+      if (craftIndex !== -1) {
+          crafts[craftIndex].name = itemName; // Update the craft name
+          crafts[craftIndex].description = itemDescription;
+          crafts[craftIndex].supplies = supply;
 
-            fs.writeFileSync('crafts.json', JSON.stringify(crafts));
-            res.status(200).send("Craft updated successfully");
-        } else {
-            res.status(404).send("Craft not found");
-        }
-    } catch (err) {
-        console.error("Error updating craft:", err);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
+          // Check if there's a new image file uploaded
+          if (req.file) {
+              crafts[craftIndex].image = req.file.filename;
+          }
+
+          fs.writeFileSync('crafts.json', JSON.stringify(crafts));
+          res.status(200).send("Craft updated successfully");
+      } else {
+          res.status(404).send("Craft not found");
+      }
+  } catch (err) {
+      console.error("Error updating craft:", err);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
 app.delete("/api/crafts/:name", (req, res) => {
