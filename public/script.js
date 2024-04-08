@@ -31,11 +31,9 @@ const showModal = (craft, index) => {
       <ul>${craft.supplies.map(item => `<li>${item}</li>`).join("")}</ul>
   `;
 
-  // Check if modal is already open
   if (modal.style.display !== "block") {
     modal.style.display = "block";
 
-    // Store the index of the clicked craft
     modal.dataset.index = index;
 
     const deleteButton = document.getElementById("deleteCraftButton");

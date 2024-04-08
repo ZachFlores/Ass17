@@ -78,11 +78,11 @@ app.put("/api/crafts/:name", (req, res) => {
       const craftIndex = crafts.findIndex(craft => craft.name === name);
 
       if (craftIndex !== -1) {
-          crafts[craftIndex].name = itemName; // Update the craft name
+          crafts[craftIndex].name = itemName; // Update craft name
           crafts[craftIndex].description = itemDescription;
           crafts[craftIndex].supplies = supply;
 
-          // Check if there's a new image file uploaded
+          //i f there's a new image file uploaded
           if (req.file) {
               crafts[craftIndex].image = req.file.filename;
           }
@@ -106,7 +106,7 @@ app.delete("/api/crafts/:name", (req, res) => {
       const craftIndex = crafts.findIndex(craft => craft.name === name);
 
       if (craftIndex !== -1) {
-          crafts.splice(craftIndex, 1); // Remove the craft from the array
+          crafts.splice(craftIndex, 1); // Remove craft from array
           fs.writeFileSync('crafts.json', JSON.stringify(crafts));
           res.status(200).send("Craft deleted successfully");
       } else {
